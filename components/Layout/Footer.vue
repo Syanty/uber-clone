@@ -1,16 +1,26 @@
 <template>
   <div class="bg-black text-white container-fluid flex flex-col space-y-10">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <div class="col-span-1 lg:col-span-2">
         <Logo class="py-10" />
         <p class="lg:pb-10">Visit Help Center</p>
       </div>
-      <div class="flex items-start justify-start lg:justify-end">
-        <p>Donot sell my info(california)</p>
-      </div>
+      <p class="text-left sm:text-right">Donot sell my info(california)</p>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-x-5 gap-y-8">
-      <div class="flex-space-y" v-for="item in footerItems" :key="item.title">
+    <div
+      class="
+        grid grid-cols-1
+        sm:grid-cols-2
+        md:grid-cols-3
+        lg:grid-cols-4
+        gap-x-5 gap-y-8
+      "
+    >
+      <div
+        class="flex-space-y transform md:last:col-span-3 lg:last:col-span-1"
+        v-for="item in footerItems"
+        :key="item.title"
+      >
         <h4>{{ item.title }}</h4>
         <ul>
           <li
@@ -23,7 +33,7 @@
         </ul>
       </div>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 py-4">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 py-4">
       <div class="flex flex-row items-center space-x-1 justify-center">
         <p
           v-for="(icon, index) in socialIcons"
@@ -37,6 +47,7 @@
             transform
             duration-300
             ease-out
+            flex justify-center
           "
         >
           <svg
@@ -55,7 +66,7 @@
           lg:col-span-2
           flex flex-col
           space-y-5
-          sm:space-x-5
+          sm:space-y-0
           sm:flex-row
           justify-center
         "
@@ -72,18 +83,7 @@
             min-w-max
           "
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z"
-              clip-rule="evenodd"
-            />
-          </svg>
+          <svg-globe></svg-globe>
           <span>English(International)</span>
         </p>
         <p
@@ -98,25 +98,17 @@
             min-w-max
           "
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-              clip-rule="evenodd"
-            />
-          </svg>
+         <svg-location></svg-location>
           <span>San Fransico Bay Area</span>
         </p>
       </div>
-      <div class="flex flex-row items-center justify-between">
+      <div class="flex flex-row space-x-5 items-center justify-between md:justify-around">
         <svg-playstore
           class="
-            w-32
+            w-24
+            sm:w-32
+            lg:w-24
+            xl:w-32
             h-14
             cursor-pointer
             active:scale-90
@@ -128,7 +120,10 @@
         ></svg-playstore>
         <svg-applestore
           class="
-            w-32
+            w-24
+            sm:w-32
+            lg:w-24
+            xl:w-32
             h-14
             cursor-pointer
             active:scale-90
@@ -140,9 +135,9 @@
         ></svg-applestore>
       </div>
     </div>
-    <div class="flex flex-row items-center justify-between p-2 text-xs">
-      <p>&copy; {{ new Date().getFullYear() }} Uber technologies Inc.</p>
-      <p class="flex flex-row items-center space-x-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-2 text-xs">
+      <p class="text-center sm:text-left">&copy; {{ new Date().getFullYear() }} Uber technologies Inc.</p>
+      <p class="flex flex-row items-center space-x-5 justify-center sm:justify-end">
         <span>Privacy</span>
         <span>Accessibility</span>
         <span>Terms</span>

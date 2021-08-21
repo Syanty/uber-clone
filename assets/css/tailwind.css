@@ -25,13 +25,13 @@
         @apply text-base lg:text-lg font-medium
     }
     p{
-        @apply font-light
+        @apply font-light w-full
     }
     button{
-        @apply py-3 px-4 bg-black text-white hover:opacity-90 active:scale-95 transform transition duration-200 ease-out
+        @apply py-3 px-4 w-full bg-black text-white hover:opacity-90 active:scale-95 transform transition duration-200 ease-out
     }
     input{
-        @apply p-4 placeholder-gray-400 bg-gray-100 outline-none
+        @apply p-4 placeholder-gray-400 bg-gray-100 outline-none w-full
     }
     .flex-space-y{
         @apply flex flex-col space-y-5
@@ -41,5 +41,8 @@
     }
     img{
         @apply object-cover
+    }
+    svg{
+        @apply flex-shrink-0
     }
 }

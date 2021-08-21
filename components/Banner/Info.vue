@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid bg-white">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div v-for="item in info" :key="item.title" class="flex-space-y">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-for="item in info" :key="item.title" class="flex-space-y transform md:last:col-span-2 lg:last:col-span-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-6 w-6"

@@ -16,7 +16,9 @@
     "@capacitor/core": "^3.2.0",
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.15.1",
-    "nuxt": "^2.15.7"
+    "nuxt": "^2.15.7",
+    "v-calendar": "^2.3.2",
+    "vue-tel-input": "^5.6.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
