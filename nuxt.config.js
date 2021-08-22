@@ -24,11 +24,15 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     {
-      src: '~/plugins/vcalendar', mode: 'client'
+      src: '~/plugins/VCalendar', mode: 'client'
     },
     {
-      src: '~/plugins/vuetelinput', mode: 'client'
+      src: '~/plugins/VueTelInput', mode: 'client'
     },
+    {
+      src: '~/plugins/VueMapbox', mode: 'client'
+    },
+    
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

@@ -25,7 +25,10 @@
         @apply text-base lg:text-lg font-medium
     }
     p{
-        @apply font-light w-full
+        @apply w-full
+    }
+    a{
+        @apply w-full cursor-pointer
     }
     button{
         @apply py-3 px-4 w-full bg-black text-white hover:opacity-90 active:scale-95 transform transition duration-200 ease-out
@@ -43,6 +46,6 @@
         @apply object-cover
     }
     svg{
-        @apply flex-shrink-0
+        @apply flex-shrink-0 cursor-pointer
     }
 }

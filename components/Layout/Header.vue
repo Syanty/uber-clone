@@ -11,11 +11,11 @@
             @click="companyDropdown = !companyDropdown"
           >
             <span>Company</span>
-            <svg-chevron-up v-if="!companyDropdown"></svg-chevron-up>
-            <svg-chevron-up
-              class="transform rotate-180"
+            <svg-chevron-down v-if="!companyDropdown"></svg-chevron-down>
+            <svg-chevron-down
               v-else
-            ></svg-chevron-up>
+              class="transform rotate-180"
+            ></svg-chevron-down>
           </p>
           <!-- company dropdown -->
           <transition-dropdown>
@@ -47,28 +47,39 @@
           <span>Products</span>
         </p>
         <p
+          v-if="auth"
           :class="loginDropdown ? 'bg-gray-800' : ''"
           class="header-p flex items-center space-x-2"
-          @click="
-            loginDropdown = !loginDropdown
-            signupDropdown = false
-          "
+          @click="$router.push('/auth/looking')"
         >
           <svg-user></svg-user>
-          <span class="hidden lg:inline-block">Log in</span>
+          <span class="hidden lg:inline-block">Account</span>
         </p>
-        <p
-          :class="
-            signupDropdown ? 'bg-gray-800 text-white' : 'bg-white text-black'
-          "
-          class="header-p hover:bg-gray-300"
-          @click="
-            signupDropdown = !signupDropdown
-            loginDropdown = false
-          "
-        >
-          Sign up
-        </p>
+        <div v-else class="flex flex-row items-center space-x-1">
+          <p
+            :class="loginDropdown ? 'bg-gray-800' : ''"
+            class="header-p flex items-center space-x-2"
+            @click="
+              loginDropdown = !loginDropdown
+              signupDropdown = false
+            "
+          >
+            <svg-user></svg-user>
+            <span class="hidden lg:inline-block">Log in</span>
+          </p>
+          <p
+            :class="
+              signupDropdown ? 'bg-gray-800 text-white' : 'bg-white text-black'
+            "
+            class="header-p hover:bg-gray-300"
+            @click="
+              signupDropdown = !signupDropdown
+              loginDropdown = false
+            "
+          >
+            Sign up
+          </p>
+        </div>
         <p
           class="header-p inline-flex lg:hidden"
           :class="headerMenu ? 'bg-gray-800' : ''"
@@ -101,11 +112,11 @@
               @click="companyDropdown = !companyDropdown"
             >
               <span>Company</span>
-              <svg-chevron-up v-if="!companyDropdown"></svg-chevron-up>
-              <svg-chevron-up
-                class="transform rotate-180"
+              <svg-chevron-down v-if="!companyDropdown"></svg-chevron-down>
+              <svg-chevron-down
                 v-else
-              ></svg-chevron-up>
+                class="transform rotate-180"
+              ></svg-chevron-down>
             </p>
           </li>
           <li v-if="companyDropdown" class="p-4">
@@ -138,7 +149,7 @@
               class="flex flex-row items-center justify-between"
               @click="
                 $router.push({
-                  path: 'account/login',
+                  path: '/account/login',
                   query: {
                     uber_client_name: item.title,
                     uber_client_type: item.type,
@@ -172,7 +183,7 @@
               class="flex flex-row items-center justify-between"
               @click="
                 $router.push({
-                  path: 'account/login',
+                  path: '/account/login',
                   query: {
                     uber_client_name: item.title,
                     uber_client_type: item.type,
@@ -196,6 +207,7 @@
 export default {
   data() {
     return {
+      auth: true,
       companyDropdown: false,
       headerMenu: false,
       loginDropdown: false,
