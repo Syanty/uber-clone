@@ -32,7 +32,6 @@ export default {
     {
       src: '~/plugins/VueMapbox', mode: 'client'
     },
-    
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

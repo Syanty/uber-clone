@@ -7,7 +7,7 @@
       h-[10vh]
       sticky
       top-0
-      z-50
+      z-40
       px-16
       flex
       items-center
