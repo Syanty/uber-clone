@@ -1,5 +1,5 @@
 <template>
-  <div id="map" class="h-full w-full">
+  <div id="map" class="h-full w-full overflow-y-scroll">
     <slot />
     <div class="hidden">
       <svg-square id="pickup_marker" class="w-4 h-4 font-bold"></svg-square>
@@ -9,24 +9,14 @@
   </div>
 </template>
 <script>
+import getcenter from 'geolib/es/getCenter'
 export default {
-  layout: 'account',
+  props: ['pickupAddress', 'destinationAddress'],
   data() {
     return {
       map: null,
-      destinationLocation: [-83.093, 42.376],
-      pickupLocation: [-83.083, 42.363],
-      coordinates: [
-        {
-          loc: [-83.083, 42.363],
-          el_id: 'pickup_marker',
-        },
-        {
-          loc: [-83.093, 42.376],
-          el_id: 'destination_marker',
-        },
-      ],
-      zoom: 13,
+      coordinates: [],
+      zoom: 11,
       style: this.$MapStyle,
       accessToken: this.$AccessToken,
       geolocate: null,
@@ -38,13 +28,23 @@ export default {
       attributionControl: false,
       style: this.style,
       accessToken: this.accessToken,
-      center: this.pickupLocation,
+      center: [-73.97644, 40.73401],
       zoom: this.zoom,
+      maxZoom: 18,
     })
 
-    this.map.on('load', () => {
+    /* this.map.on('load', () => {
       this.geolocate.trigger()
-    })
+    }) */
+    this.coordinates = [
+      {
+        name: 'Test Location',
+        loc: [-73.97644, 40.73401],
+        el_id: 'default_marker',
+        way: '',
+      },
+    ]
+    this.addMarker()
 
     // this.addDirectionControl()
     this.addCustomAttributeControl()
@@ -58,12 +58,15 @@ export default {
         unit: 'metric',
         profile: 'mapbox/driving',
         alternatives: false,
+        congestion: true,
         geometries: 'geojson',
         controls: { instructions: false },
         flyTo: false,
+        placeholderOrigin: 'Origin',
+        placeholderDestination: 'Destination',
       })
-
-      this.addMapControl(directions, 'bottom-right')
+      // document.getElementById('directionControl').appendChild(directions.onAdd(this.map))
+      this.addMapControl(directions, 'top-right')
     },
     addNavigationControl() {
       this.addMapControl(new this.$MapBoxGl.NavigationControl(), 'bottom-right')
@@ -102,19 +105,30 @@ export default {
             new this.$MapBoxGl.Popup({
               closeButton: false,
               closeOnClick: false,
-            }).setHTML(`<p> <a>From</a>${coord.loc}</p>`)
+            }).setHTML(`<p class="space-x-2"> 
+                  <a class="text-blue-500 space-x-1">
+                  ${coord.way}
+                  </a>
+                  ${coord.name}
+              </p>`)
           )
           .addTo(this.map)
       })
     },
-    async getRoute() {
+    async getRoute(coordinates) {
       await this.$axios
         .get(
-          `https://api.mapbox.com/directions/v5/mapbox/driving/-83.093,42.376;-83.083,42.363?alternatives=true&geometries=geojson&steps=true&access_token=pk.eyJ1IjoiaWFtc2FudHkiLCJhIjoiY2tzaGcydWo2MXRzbTJ2b2Q4ZXZnaTg5ayJ9.Q4UAWGgMINrgBnqxHWvbKg
+          `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?alternatives=true&geometries=geojson&steps=true&access_token=${process.env.NUXT_ENV_MAPBOX_KEY}
 `
         )
         .then((res) => {
           const data = res.data.routes[0]
+          const distance = data.distance // in meters
+          // const duration = data.duration /* in seconds */
+
+          if (distance > 50000) {
+            this.map.setZoom(2)
+          }
           const route = data.geometry.coordinates
           const geojson = {
             type: 'Feature',
@@ -147,11 +161,60 @@ export default {
           },
           paint: {
             'line-color': 'black',
-            'line-width': ['interpolate', ['linear'], ['zoom'], 12, 3, 22, 13],
+            'line-width': ['interpolate', ['linear'], ['zoom'], 15, 3, 22, 13],
           },
         },
         'waterway-label'
       )
+    },
+  },
+  watch: {
+    pickupAddress: function () {
+      if (Object.keys(this.pickupAddress).length > 0) {
+        const location = [this.pickupAddress.lon, this.pickupAddress.lat]
+        this.map.setCenter(location)
+        this.coordinates.push({
+          loc: location,
+          name: this.pickupAddress.name,
+          el_id: 'pickup_marker',
+          way: 'From - ',
+        })
+
+        this.addMarker()
+      }
+    },
+    destinationAddress: function () {
+      if (Object.keys(this.destinationAddress).length > 0) {
+        const destLocation = {
+          longitude: this.destinationAddress.lon,
+          latitude: this.destinationAddress.lat,
+        }
+
+        // current pickup location
+        const pickupLocation = this.map.getCenter()
+
+        const coordinates = [
+          {
+            longitude: pickupLocation.lng,
+            latitude: pickupLocation.lat,
+          },
+          destLocation,
+        ]
+        const center = getcenter(coordinates)
+
+        this.map.setCenter([center.longitude, center.latitude])
+
+        this.coordinates.push({
+          loc: [destLocation.longitude, destLocation.latitude],
+          name: this.pickupAddress.name,
+          el_id: 'destination_marker',
+          way: 'To - ',
+        })
+
+        this.addMarker()
+        const routeCoords = `${pickupLocation.lng},${pickupLocation.lat};${destLocation.longitude},${destLocation.latitude}`
+        this.getRoute(routeCoords)
+      }
     },
   },
 }

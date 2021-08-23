@@ -21,6 +21,7 @@ module.exports = {
     "vue/require-prop-types": 0,
     "vue/order-in-components":0,
     "no-console":0,
-    "vue/attribute-hyphenation":0
+    "vue/attribute-hyphenation":0,
+    "object-shorthand":0
   }
 }

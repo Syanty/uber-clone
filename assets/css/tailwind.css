@@ -36,6 +36,13 @@
     input{
         @apply p-4 placeholder-gray-400 bg-gray-100 outline-none w-full
     }
+    select{
+        @apply p-4 bg-gray-100 outline-none w-full appearance-none cursor-pointer
+    }
+    option{
+        @apply py-2 px-7 cursor-pointer space-x-5 items-center hover:bg-gray-200 
+    }
+
     .flex-space-y{
         @apply flex flex-col space-y-5
     }

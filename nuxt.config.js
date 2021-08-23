@@ -31,7 +31,7 @@ export default {
     },
     {
       src: '~/plugins/MapBox', mode: 'client'
-    }
+    },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
