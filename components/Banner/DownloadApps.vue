@@ -7,21 +7,9 @@
           class="p-5 bg-white flex flex-row items-center cursor-pointer group"
         >
           <secondary-logo>
-            <span
-              ><svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-10 w-10"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                /></svg
-            ></span>
+            <span>
+              <svg-arrow-right></svg-arrow-right>
+            </span>
           </secondary-logo>
           <div class="mx-auto text-center">
             <h3>Download the driver App</h3>

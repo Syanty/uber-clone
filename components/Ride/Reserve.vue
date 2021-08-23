@@ -15,20 +15,39 @@
           <h4>Destination</h4>
           <ride-form :placeholder="['Where from?', 'Where to?']"></ride-form>
           <h4>Choose date and time</h4>
-          <div class="w-full flex flex-row items-center space-x-5 sm:justify-between">
-            <v-date-picker v-model="date" is-required :min-date="new Date()">
+          <div
+            class="
+              w-full
+              flex flex-row
+              items-center
+              space-x-5
+              sm:justify-between
+            "
+          >
+            <client-only>
+              <v-date-picker v-model="date" is-required :min-date="new Date()">
                 <template #default="{ inputValue, inputEvents }">
-                  <input :value="inputValue" v-on="inputEvents" type="text" class="w-full flex-grow" />
+                  <input
+                    :value="inputValue"
+                    v-on="inputEvents"
+                    type="text"
+                    class="w-full flex-grow"
+                  />
                 </template>
               </v-date-picker>
-            <v-date-picker mode="time" v-model="date" is-required>
+              <v-date-picker mode="time" v-model="date" is-required>
                 <template #default="{ inputValue, inputEvents }">
-                  <input :value="inputValue" v-on="inputEvents" type="text" class="w-full flex-grow" />
+                  <input
+                    :value="inputValue"
+                    v-on="inputEvents"
+                    type="text"
+                    class="w-full flex-grow"
+                  />
                 </template>
               </v-date-picker>
+            </client-only>
           </div>
           <button>Reserve a ride</button>
-          
         </div>
       </div>
     </div>
@@ -38,7 +57,6 @@
 export default {
   data() {
     return {
-      
       date: new Date(),
     }
   },

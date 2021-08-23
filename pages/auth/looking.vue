@@ -1,192 +1,134 @@
 <template>
   <div
     class="h-full lg:h-[90vh] w-full z-30 fixed top-0 lg:top-[10vh]"
-    v-if="attrLoaded"
   >
-    <client-only>
-      <MglMap
-        :accessToken="access_token"
-        :mapStyle.sync="mapStyle"
-        :center="getCenter"
-        :zoom="zoom"
-        :offset="[-20, -10]"
+    <Map>
+      <div
+        class="
+          z-50
+          w-full
+          lg:w-[500px]
+          h-full
+          absolute
+          flex
+          justify-center
+          items-center
+          overflow-y-scroll
+          scrollbar-hide
+        "
       >
-         <div
+        <div
           class="
-            z-50
-            w-full
-            lg:w-[500px]
-            h-full
             absolute
-            flex
-            justify-center
-            items-center
-            overflow-y-scroll
-            scrollbar-hide
+            bg-white
+            w-full
+            h-full
+            lg:w-[90%]
+            lg:h-[90%]
+            flex flex-col
           "
         >
+          <div class="bg-blue-700 w-full text-white p-10">
+            <h2>Where can we pick you up?</h2>
+          </div>
           <div
             class="
-              absolute
-              bg-white
-              w-full
               h-full
-              lg:w-[90%]
-              lg:h-[90%]
-              flex flex-col
+              lg:h-2/3
+              w-full
+              overflow-y-auto
+              scrollbar-hide
+              py-10
+              bg-white
             "
           >
-            <div class="bg-blue-700 w-full text-white p-10">
-              <h2>Where can we pick you up?</h2>
+            <div class="px-7">
+              <div class="flex mt-5">
+                <input
+                  v-if="!lookup"
+                  type="text"
+                  placeholder="Pickup location"
+                  @input="autoComplete(pickup)"
+                  class="focus:border-b-2 border-blue-700 focus:bg-blue-50"
+                  v-model="pickup"
+                />
+                <input
+                  v-else
+                  type="text"
+                  placeholder="Destination"
+                  @input="autoComplete(destination)"
+                  class="focus:border-b-2 border-blue-700 focus:bg-blue-50"
+                  v-model="destination"
+                />
+              </div>
+              <div class="flex justify-start py-5">
+                <button
+                  class="
+                    bg-gray-300
+                    p-2
+                    px-4
+                    w-1/3
+                    text-black
+                    rounded-full
+                    flex flex-row
+                    items-center
+                  "
+                >
+                  <svg-clock class="w-3 h-3"></svg-clock>
+                  <p class="mx-2">Now</p>
+                  <svg-chevron-down class="w-3 h-3"></svg-chevron-down>
+                </button>
+              </div>
             </div>
-            <div
-              class="
-                h-full
-                lg:h-2/3
-                w-full
-                overflow-y-auto
-                scrollbar-hide
-                py-10
-                bg-white
-              "
-            >
-              <div class="px-7">
-                <div class="flex mt-5">
-                  <input
-                    v-if="!lookup"
-                    type="text"
-                    placeholder="Pickup location"
-                    @input="autoComplete(pickup)"
-                    class="focus:border-b-2 border-blue-700 focus:bg-blue-50"
-                    v-model="pickup"
-                  />
-                  <input
-                    v-else
-                    type="text"
-                    placeholder="Destination"
-                    @input="autoComplete(destination)"
-                    class="focus:border-b-2 border-blue-700 focus:bg-blue-50"
-                    v-model="destination"
-                  />
-                </div>
-                <div class="flex justify-start py-5">
-                  <button
-                    class="
-                      bg-gray-300
-                      p-2
-                      px-4
-                      w-1/3
-                      text-black
-                      rounded-full
-                      flex flex-row
-                      items-center
-                    "
-                  >
-                    <svg-clock class="w-3 h-3"></svg-clock>
-                    <p class="mx-2">Now</p>
-                    <svg-chevron-down class="w-3 h-3"></svg-chevron-down>
-                  </button>
-                </div>
-              </div>
-              <div>
-                <ul>
-                  <li
-                    v-for="item in searchResults"
-                    :key="item.properties.place_id"
-                    @click="setLocation(item.properties)"
-                    class="
-                      py-2
-                      px-7
-                      cursor-pointer
-                      flex flex-row
-                      space-x-5
-                      items-center
-                      hover:bg-gray-200
-                    "
-                  >
-                    <span class="p-2 rounded-full bg-gray-400">
-                      <svg-location></svg-location>
-                    </span>
-                    <div class="flex flex-col w-full border-b pb-2">
-                      <h4>
-                        {{ item.properties.name || item.properties.city }}
-                      </h4>
-                      <p class="text-sm">
-                        {{ item.properties.formatted }}
-                      </p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
+            <div>
+              <ul>
+                <li
+                  v-for="item in searchResults"
+                  :key="item.properties.place_id"
+                  @click="setLocation(item.properties)"
+                  class="
+                    py-2
+                    px-7
+                    cursor-pointer
+                    flex flex-row
+                    space-x-5
+                    items-center
+                    hover:bg-gray-200
+                  "
+                >
+                  <span class="p-2 rounded-full bg-gray-400">
+                    <svg-location></svg-location>
+                  </span>
+                  <div class="flex flex-col w-full border-b pb-2">
+                    <h4>
+                      {{ item.properties.name || item.properties.city }}
+                    </h4>
+                    <p class="text-sm">
+                      {{ item.properties.formatted }}
+                    </p>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-        <MglGeolocateControl position="bottom-right"/>
-        <MglFullscreenControl />
-        <MglNavigationControl position="bottom-right" />
-        <div v-for="coord in getCoordinates" :key="coord.name">
-          <MglMarker
-            :coordinates="[coord.longitude, coord.latitude]"
-            color="black"
-          >
-            <MglPopup
-              :offset="[0, -10]"
-              :showed="true"
-              :closeButton="false"
-              :closeOnClick="false"
-            >
-              <div>{{ coord.name }}</div>
-            </MglPopup>
-          </MglMarker>
-        </div>
-      </MglMap>
-    </client-only>
+      </div>
+    </Map>
   </div>
 </template>
 <script>
 import getcenter from 'geolib/es/getCenter'
-import ipInfo from 'ipinfo'
 export default {
   layout: 'auth',
   data() {
     return {
-      mapStyle: 'mapbox://styles/iamsanty/ckslydyu40qoe17p3dzw9jo6a',
-      coordinates: [
-        {
-          latitude: 0,
-          longitude: 0,
-          name: 'Test location',
-        },
-      ],
-      access_token: process.env.NUXT_ENV_MAPBOX_KEY,
-      center: [0, 0],
-      zoom: 11,
-      attrLoaded: true,
       pickup: '',
       destination: '',
       searchResults: [],
       lookup: false,
     }
   },
-  mounted() {
-    // this.fetchIpInfo()
-  },
   methods: {
-    fetchIpInfo() {
-      ipInfo((err, cLoc) => {
-        if (err) return
-        const coords = cLoc.loc.split(',')
-        this.center = [parseFloat(coords[1]), parseFloat(coords[0])]
-        this.coordinates = [
-          {
-            longitude: this.center[0],
-            latitude: this.center[1],
-            name: cLoc.city,
-          },
-        ]
-        this.attrLoaded = true
-      })
-    },
     getLocation() {
       if (window.navigator.geolocation) {
         window.navigator.geolocation.getCurrentPosition(
@@ -275,42 +217,3 @@ export default {
   },
 }
 </script>
-<style scoped>
-.rounded-rect {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 50px -25px black;
-}
-
-.flex-center {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.sidebar-content {
-  position: absolute;
-  width: 95%;
-  height: 95%;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 32px;
-  color: gray;
-}
-
-.sidebar-toggle {
-  position: absolute;
-  width: 1.3em;
-  height: 1.3em;
-  overflow: visible;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.sidebar {
-  transition: transform 1s;
-  z-index: 1;
-  width: 300px;
-  height: 100%;
-}
-</style>

@@ -30,8 +30,8 @@ export default {
       src: '~/plugins/VueTelInput', mode: 'client'
     },
     {
-      src: '~/plugins/VueMapbox', mode: 'client'
-    },
+      src: '~/plugins/MapBox', mode: 'client'
+    }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

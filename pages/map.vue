@@ -1,11 +1,9 @@
 <template>
   <div id="map" class="h-full w-full">
-    <slot />
-    <div class="hidden">
+   <div class="hidden">
       <svg-square id="pickup_marker" class="w-4 h-4 font-bold"></svg-square>
-      <svg-circle id="destination_marker" class="w-4 h-4"></svg-circle>
-      <svg-location id="default_marker" class="w-4 h-4"></svg-location>
-    </div>
+    <svg-circle id="destination_marker" class="w-4 h-4"></svg-circle>
+   </div>
   </div>
 </template>
 <script>
@@ -29,7 +27,6 @@ export default {
       zoom: 13,
       style: this.$MapStyle,
       accessToken: this.$AccessToken,
-      geolocate: null,
     }
   },
   mounted() {
@@ -43,12 +40,29 @@ export default {
     })
 
     this.map.on('load', () => {
-      this.geolocate.trigger()
+      this.coordinates.forEach((coord) => {
+        const el = document.getElementById(coord.el_id)
+        new this.$MapBoxGl.Marker({
+          color: 'black',
+          element: el,
+        })
+          .setLngLat(coord.loc)
+          .setPopup(
+            new this.$MapBoxGl.Popup({
+              closeButton: false,
+              closeOnClick: false,
+            }).setHTML(`<p> <a>From</a>${coord.loc}</p>`)
+          )
+          .addTo(this.map)
+      })
+
+      /* add route */
+      this.getRoute()
     })
 
     // this.addDirectionControl()
-    this.addCustomAttributeControl()
     this.addNavigationControl()
+    this.addCustomAttributeControl()
     this.addGeolocateControl()
   },
   methods: {
@@ -66,7 +80,7 @@ export default {
       this.addMapControl(directions, 'bottom-right')
     },
     addNavigationControl() {
-      this.addMapControl(new this.$MapBoxGl.NavigationControl(), 'bottom-right')
+      this.addMapControl(new this.$MapBoxGl.NavigationControl(),'bottom-right')
     },
     addCustomAttributeControl() {
       this.addMapControl(
@@ -77,35 +91,17 @@ export default {
     },
     addGeolocateControl() {
       this.addMapControl(
-        (this.geolocate = new this.$MapBoxGl.GeolocateControl({
+        new this.$MapBoxGl.GeolocateControl({
           positionOptions: {
             enableHighAccuracy: true,
           },
-          showAccuracyCircle: false,
           trackUserLocation: true,
           showUserHeading: true,
-        }))
+        })
       )
     },
     addMapControl(control, options) {
       this.map.addControl(control, options)
-    },
-    addMarker() {
-      this.coordinates.forEach((coord) => {
-        const el = document.getElementById(coord.el_id)
-        new this.$MapBoxGl.Marker({
-          color: 'black',
-          element: el,
-        })
-          .setLngLat(coord.loc)
-          .setPopup(
-            new this.$MapBoxGl.Popup({
-              closeButton: false,
-              closeOnClick: false,
-            }).setHTML(`<p> <a>From</a>${coord.loc}</p>`)
-          )
-          .addTo(this.map)
-      })
     },
     async getRoute() {
       await this.$axios
@@ -133,7 +129,6 @@ export default {
           /* add route layer i.e path */
           this.addRouteLayer()
         })
-        .catch(() => {})
     },
     addRouteLayer() {
       this.map.addLayer(
