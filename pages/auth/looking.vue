@@ -17,16 +17,26 @@
           items-center
         "
       >
-        <search-ride
-          @getLocation="location = $event"
-          @getClickedSearchItem="fetchLocation($event)"
-          @loadPickup="pickupAddress = $event"
-          @loadDestination="destinationAddress = $event"
-          :location="location"
-          :getSearchResults="getSearchResults"
-          :pickupLoaded="pickupLoaded"
-          :coordsLoaded="coordsLoaded"
-        ></search-ride>
+         <search-ride
+        @getLocation="location = $event"
+        @getClickedSearchItem="fetchLocation($event)"
+        @loadPickup="pickupAddress = $event"
+        @loadDestination="destinationAddress = $event"
+        @setCoordsLoaded="
+          coordsLoaded = false
+          location = $event
+        "
+        @setPickupLoaded="
+          pickupLoaded = false
+          location = $event
+        "
+        :location="location"
+        :getSearchResults="getSearchResults"
+        :pickupLoaded="pickupLoaded"
+        :coordsLoaded="coordsLoaded"
+        :pickupAddress="pickupAddress"
+        :destinationAddress="destinationAddress"
+      ></search-ride>
       </div>
     </Map>
     <div
@@ -38,8 +48,8 @@
         h-[60%]
         absolute
         bottom-0
-        justify-center
-        items-center
+        justify-end
+        items-end
       "
     >
       <search-ride
@@ -47,10 +57,20 @@
         @getClickedSearchItem="fetchLocation($event)"
         @loadPickup="pickupAddress = $event"
         @loadDestination="destinationAddress = $event"
+        @setCoordsLoaded="
+          coordsLoaded = false
+          location = $event
+        "
+        @setPickupLoaded="
+          pickupLoaded = false
+          location = $event
+        "
         :location="location"
         :getSearchResults="getSearchResults"
         :pickupLoaded="pickupLoaded"
         :coordsLoaded="coordsLoaded"
+        :pickupAddress="pickupAddress"
+        :destinationAddress="destinationAddress"
       ></search-ride>
     </div>
   </div>
@@ -69,17 +89,6 @@ export default {
       clickedSearchItem: '',
     }
   },
-  
-  mounted() {
-    if (this.$route.query.refresh_id === '') {
-      this.$router.replace({
-        path: this.$route.path,
-        query: {
-          refresh_id: 'asdasd',
-        },
-      })
-    }
-  },
   methods: {
     autoComplete() {
       this.$axios
@@ -89,7 +98,9 @@ export default {
         .then((res) => {
           this.searchResults = res.data.features
         })
-        .catch(() => {})
+        .catch(() => {
+          console.clear()
+        })
     },
     fetchLocation(location) {
       let query = {}
@@ -131,10 +142,12 @@ export default {
       }
       this.location = ''
       this.clickedSearchItem = ''
-      this.$router.replace({
-        path: this.$route.path,
-        query: query,
-      })
+      this.$router
+        .replace({
+          path: this.$route.path,
+          query: query,
+        })
+        .catch(() => {})
     },
   },
   computed: {

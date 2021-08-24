@@ -2,11 +2,9 @@
   <div id="map" class="w-full h-[40%] z-40 lg:h-full">
     <slot :route="route" />
     <div class="hidden">
-      <svg-square
-        id="pickup_marker"
-        class="w-4 h-4 font-bold"
-      ></svg-square>
-      <svg-circle id="destination_marker" class="w-4 h-4"></svg-circle>
+      <svg-square-outline-bold id="pickup_marker" class="w-5 h-5"></svg-square-outline-bold>
+      <svg-circle-outline-bold id="destination_marker" class="w-5 h-5"></svg-circle-outline-bold>
+      <svg-placeholder id="default_marker" class="w-12 h-12"></svg-placeholder>
     </div>
   </div>
 </template>
@@ -23,6 +21,15 @@ export default {
       accessToken: this.$AccessToken,
       geolocate: null,
       route: {},
+      popupOffsets: {
+        top: [0, -15],
+        'top-left': [0, 0],
+        'top-right': [0, 0],
+        bottom: [0, -20],
+        'bottom-left': [10, -20],
+        left: [-10, -15],
+        right: [-10,-10],
+      },
     }
   },
   mounted() {
@@ -100,6 +107,7 @@ export default {
         new this.$MapBoxGl.Popup({
           closeButton: false,
           closeOnClick: false,
+          offset: this.popupOffsets,
         })
           .setHTML(
             `<p class="space-x-2"> 
@@ -178,6 +186,15 @@ export default {
         })
 
         this.addMarker()
+        this.map.flyTo({
+          center: location,
+          zoom: 13,
+          essential: true,
+          bearing: 0,
+          speed: 0.3,
+          curve: 1,
+          easing: (t) => t,
+        })
       }
     },
     destinationAddress: function () {
@@ -214,6 +231,15 @@ export default {
         })
 
         this.addMarker()
+        this.map.flyTo({
+          center: this.destinationAddress,
+          zoom: 13,
+          essential: true,
+          bearing: 0,
+          speed: 1,
+          curve: 1,
+          easing: (t) => t,
+        })
         const routeCoords = `${pickupLocation.longitude},${pickupLocation.latitude};${destLocation.longitude},${destLocation.latitude}`
         this.getRoute(routeCoords)
       }
