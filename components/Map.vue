@@ -1,14 +1,17 @@
 <template>
-  <div id="map" class="h-full w-full overflow-y-scroll">
+  <div id="map" class="w-full h-[40%] z-40 lg:h-full">
     <slot :route="route" />
     <div class="hidden">
-      <svg-square id="pickup_marker" class="w-4 h-4 font-bold"></svg-square>
+      <svg-square
+        id="pickup_marker"
+        class="w-4 h-4 font-bold"
+      ></svg-square>
       <svg-circle id="destination_marker" class="w-4 h-4"></svg-circle>
     </div>
   </div>
 </template>
 <script>
-import getcenter from 'geolib/es/getCenter'
+// import getcenter from 'geolib/es/getCenter'
 export default {
   props: ['pickupAddress', 'destinationAddress'],
   data() {
@@ -78,8 +81,7 @@ export default {
           showAccuracyCircle: false,
           trackUserLocation: true,
           showUserHeading: true,
-        })),
-        'bottom-right'
+        }))
       )
     },
     addMapControl(control, options) {
@@ -123,12 +125,6 @@ export default {
           const duration = data.duration /* in seconds */
 
           this.route = { distance, duration }
-
-          if (distance > 500000) {
-            this.map.setZoom(2)
-          }
-
-          
 
           const route = data.geometry.coordinates
           const geojson = {
@@ -186,15 +182,20 @@ export default {
     },
     destinationAddress: function () {
       if (Object.keys(this.destinationAddress).length > 0) {
+        const pickupLocation = {
+          longitude: this.pickupAddress.lon,
+          latitude: this.pickupAddress.lat,
+        }
+
         const destLocation = {
           longitude: this.destinationAddress.lon,
           latitude: this.destinationAddress.lat,
         }
 
         // current pickup location
-        const pickupLocation = this.map.getCenter()
+        // const pickupLocation = this.map.getCenter()
 
-        const coordinates = [
+        /* const coordinates = [
           {
             longitude: pickupLocation.lng,
             latitude: pickupLocation.lat,
@@ -203,17 +204,17 @@ export default {
         ]
         const center = getcenter(coordinates)
 
-        this.map.setCenter([center.longitude, center.latitude])
+        this.map.setCenter([center.longitude, center.latitude]) */
 
         this.coordinates.push({
           loc: [destLocation.longitude, destLocation.latitude],
-          name: this.pickupAddress.name,
+          name: this.destinationAddress.name,
           el_id: 'destination_marker',
           way: 'To - ',
         })
 
         this.addMarker()
-        const routeCoords = `${pickupLocation.lng},${pickupLocation.lat};${destLocation.longitude},${destLocation.latitude}`
+        const routeCoords = `${pickupLocation.longitude},${pickupLocation.latitude};${destLocation.longitude},${destLocation.latitude}`
         this.getRoute(routeCoords)
       }
     },

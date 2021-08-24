@@ -28,54 +28,52 @@
       "
     >
       <h2>Where can we pick you up?</h2>
-      <p v-show="Object.keys(route).length > 0">
-        {{ route.distance }} metres || {{ route.duration }} seconds away
-      </p>
     </div>
     <div
       class="
         h-full
         lg:h-2/3
         w-full
-        overflow-y-auto
-        scrollbar-hide
         py-10
         bg-white
+        overflow-y-scroll
+        scrollbar-hide
       "
     >
       <div class="px-7">
-        <div class="flex mt-5" v-if="!coordsLoaded">
+        <div class="flex sticky -top-10 flex-col space-x-2 bg-white">
           <input
+            v-if="!coordsLoaded"
             type="text"
             :placeholder="pickupLoaded ? 'Destination' : 'Pickup Location'"
-            @input="autoComplete"
+            @input="$emit('getLocation', locationData)"
             class="focus:border-b-2 border-blue-700 focus:bg-blue-50 text-lg"
-            v-model="location"
+            v-model="locationData"
           />
+          <div class="flex justify-start py-5">
+            <button
+              class="
+                bg-gray-300
+                p-2
+                px-4
+                w-1/3
+                text-black
+                rounded-full
+                flex flex-row
+                items-center
+              "
+            >
+              <svg-clock class="w-3 h-3"></svg-clock>
+              <p class="mx-2">Now</p>
+              <svg-chevron-down class="w-3 h-3"></svg-chevron-down>
+            </button>
+          </div>
         </div>
 
-        <div class="flex justify-start py-5">
-          <button
-            class="
-              bg-gray-300
-              p-2
-              px-4
-              w-1/3
-              text-black
-              rounded-full
-              flex flex-row
-              items-center
-            "
-          >
-            <svg-clock class="w-3 h-3"></svg-clock>
-            <p class="mx-2">Now</p>
-            <svg-chevron-down class="w-3 h-3"></svg-chevron-down>
-          </button>
-        </div>
         <div v-if="coordsLoaded">
           <ul>
             <li
-              v-for="i in 10"
+              v-for="i in 20"
               :key="i"
               class="
                 py-2
@@ -85,6 +83,8 @@
                 space-x-5
                 items-center
                 hover:bg-gray-200
+                overflow-y-scroll
+                scrollbar-hide
               "
             >
               Uber {{ i }}
@@ -93,12 +93,12 @@
         </div>
       </div>
       <div>
-        <ul v-if="location">
+        <ul v-if="locationData">
           <search-result-item
-            v-for="item in searchResults"
+            v-for="item in getSearchResults"
             :key="item.properties.place_id"
             :item="item"
-            @itemClicked="searchResultItemClicked($event)"
+            @itemClicked="$emit('getClickedSearchItem', $event)"
           ></search-result-item>
         </ul>
       </div>
@@ -107,82 +107,23 @@
 </template>
 <script>
 export default {
-  props: ['route'],
+  props: [
+    'location',
+    'searchResultItemClicked',
+    'autoComplete',
+    'getSearchResults',
+    'pickupLoaded',
+    'coordsLoaded',
+  ],
   data() {
     return {
-      location: '',
-      searchResults: [],
-      pickupLoaded: false,
-      coordsLoaded: false,
+      locationData: '',
+      clickedSearchItem: {},
     }
   },
-  mounted() {
-    if (this.$route.query.refresh_id === '') {
-      this.$router.replace({
-        path: this.$route.path,
-        query: {
-          refresh_id: 'asdasd',
-        },
-      })
-    }
-  },
-  methods: {
-    autoComplete() {
-      setTimeout(() => {
-        this.$axios
-          .get(
-            `https://api.geoapify.com/v1/geocode/autocomplete?text=${this.location}&apiKey=${process.env.NUXT_ENV_GEOAPIFY_KEY}`
-          )
-          .then((res) => {
-            this.searchResults = res.data.features
-          })
-          .catch(() => {})
-      }, 2000)
-    },
-    searchResultItemClicked(location) {
-      let query = {}
-
-      /* after pickup address is provided */
-      if (this.pickupLoaded) {
-        this.coordsLoaded = true
-        query = {
-          ...this.$route.query,
-          destination_id: location.place_id,
-          destination_address: location.formatted,
-          destination_latitude: location.lat,
-          destination_longitude: location.lon,
-        }
-        const destination = {
-          name: location.name || location.formatted,
-          lat: location.lat,
-          lon: location.lon,
-        }
-
-        this.$emit('loadDestination', destination)
-      } else {
-        /* provide pickup address */
-        this.pickupLoaded = true
-        query = {
-          ...this.$route.query,
-          pickup_id: location.place_id,
-          pickup_address: location.formatted,
-          pickup_latitude: location.lat,
-          pickup_longitude: location.lon,
-        }
-        const pickup = {
-          name: location.name || location.formatted,
-          lat: location.lat,
-          lon: location.lon,
-        }
-
-        this.$emit('loadPickup', pickup)
-      }
-      this.searchResults = []
-      this.location = ''
-      this.$router.replace({
-        path: this.$route.path,
-        query: query,
-      })
+  watch: {
+    location: function () {
+      this.locationData = this.location
     },
   },
 }

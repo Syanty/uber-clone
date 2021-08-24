@@ -8,7 +8,9 @@
       sticky
       top-0
       z-40
-      px-16
+      lg:px-16
+      mx-10
+      lg:mx-0
       flex
       items-center
     "
