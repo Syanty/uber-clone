@@ -1,10 +1,9 @@
 <template>
   <div id="map" class="h-full w-full overflow-y-scroll">
-    <slot />
+    <slot :route="route" />
     <div class="hidden">
       <svg-square id="pickup_marker" class="w-4 h-4 font-bold"></svg-square>
       <svg-circle id="destination_marker" class="w-4 h-4"></svg-circle>
-      <svg-location id="default_marker" class="w-4 h-4"></svg-location>
     </div>
   </div>
 </template>
@@ -20,6 +19,7 @@ export default {
       style: this.$MapStyle,
       accessToken: this.$AccessToken,
       geolocate: null,
+      route: {},
     }
   },
   mounted() {
@@ -33,18 +33,9 @@ export default {
       maxZoom: 18,
     })
 
-    /* this.map.on('load', () => {
+    this.map.on('load', () => {
       this.geolocate.trigger()
-    }) */
-    this.coordinates = [
-      {
-        name: 'Test Location',
-        loc: [-73.97644, 40.73401],
-        el_id: 'default_marker',
-        way: '',
-      },
-    ]
-    this.addMarker()
+    })
 
     // this.addDirectionControl()
     this.addCustomAttributeControl()
@@ -87,7 +78,8 @@ export default {
           showAccuracyCircle: false,
           trackUserLocation: true,
           showUserHeading: true,
-        }))
+        })),
+        'bottom-right'
       )
     },
     addMapControl(control, options) {
@@ -101,17 +93,21 @@ export default {
           element: el,
         })
           .setLngLat(coord.loc)
-          .setPopup(
-            new this.$MapBoxGl.Popup({
-              closeButton: false,
-              closeOnClick: false,
-            }).setHTML(`<p class="space-x-2"> 
+          .addTo(this.map)
+
+        new this.$MapBoxGl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+        })
+          .setHTML(
+            `<p class="space-x-2"> 
                   <a class="text-blue-500 space-x-1">
                   ${coord.way}
                   </a>
                   ${coord.name}
-              </p>`)
+              </p>`
           )
+          .setLngLat(coord.loc)
           .addTo(this.map)
       })
     },
@@ -124,11 +120,16 @@ export default {
         .then((res) => {
           const data = res.data.routes[0]
           const distance = data.distance // in meters
-          // const duration = data.duration /* in seconds */
+          const duration = data.duration /* in seconds */
 
-          if (distance > 50000) {
+          this.route = { distance, duration }
+
+          if (distance > 500000) {
             this.map.setZoom(2)
           }
+
+          
+
           const route = data.geometry.coordinates
           const geojson = {
             type: 'Feature',

@@ -7,13 +7,30 @@
       h-full
       lg:w-[90%]
       lg:h-[90%]
-      flex flex-col items-end lg:items-center
+      flex flex-col
+      items-end
+      lg:items-center
       lg:rounded-lg
       lg:shadow-lg
     "
   >
-    <div class="bg-blue-700 w-full text-white p-10 hidden lg:flex lg:rounded-t-lg">
+    <div
+      class="
+        bg-blue-700
+        w-full
+        text-white
+        p-10
+        hidden
+        lg:flex
+        lg:rounded-t-lg
+        flex-col
+        space-y-2
+      "
+    >
       <h2>Where can we pick you up?</h2>
+      <p v-show="Object.keys(route).length > 0">
+        {{ route.distance }} metres || {{ route.duration }} seconds away
+      </p>
     </div>
     <div
       class="
@@ -36,25 +53,7 @@
             v-model="location"
           />
         </div>
-        <div v-else>
-          <ul>
-            <li
-              v-for="i in 10"
-              :key="i"
-              class="
-                py-2
-                px-7
-                cursor-pointer
-                flex flex-row
-                space-x-5
-                items-center
-                hover:bg-gray-200
-              "
-            >
-              Uber {{ i }}
-            </li>
-          </ul>
-        </div>
+
         <div class="flex justify-start py-5">
           <button
             class="
@@ -73,11 +72,30 @@
             <svg-chevron-down class="w-3 h-3"></svg-chevron-down>
           </button>
         </div>
+        <div v-if="coordsLoaded">
+          <ul>
+            <li
+              v-for="i in 10"
+              :key="i"
+              class="
+                py-2
+                px-7
+                cursor-pointer
+                flex flex-row
+                space-x-5
+                items-center
+                hover:bg-gray-200
+              "
+            >
+              Uber {{ i }}
+            </li>
+          </ul>
+        </div>
       </div>
       <div>
         <ul v-if="location">
           <search-result-item
-            v-for="item in getSearchResult"
+            v-for="item in searchResults"
             :key="item.properties.place_id"
             :item="item"
             @itemClicked="searchResultItemClicked($event)"
@@ -89,6 +107,7 @@
 </template>
 <script>
 export default {
+  props: ['route'],
   data() {
     return {
       location: '',
@@ -164,11 +183,6 @@ export default {
         path: this.$route.path,
         query: query,
       })
-    },
-  },
-  computed: {
-    getSearchResult() {
-      return this.searchResults
     },
   },
 }
