@@ -10,7 +10,7 @@
         class="w-5 h-5"
       ></svg-circle-outline-bold>
       <svg-placeholder id="default_marker" class="w-12 h-12"></svg-placeholder>
-      <svg-car-top id="cab_marker" class="w-12 h-12"></svg-car-top>
+      <svg-car-top class="car w-12 h-12"></svg-car-top>
     </div>
   </div>
 </template>
@@ -22,10 +22,7 @@ export default {
     return {
       map: null,
       coordinates: [],
-      cabsCoordinates: [
-        [0, 0],
-        [-77.0364, 38.8951],
-      ],
+      cabsCoordinates: [],
       zoom: 11,
       style: this.$MapStyle,
       accessToken: this.$AccessToken,
@@ -137,14 +134,92 @@ export default {
           .addTo(this.map)
       })
     },
-    addCabsMarker() {
+    async addCabsMarker() {
+      /* find coordinates from api */
+      await this.$axios
+        .get(
+          `https://api.geoapify.com/v2/places?categories=commercial.vehicle,parking.cars,service.taxi&filter=circle:${this.getPickup.pickup_longitude},${this.getPickup.pickup_latitude},5000&bias=proximity:${this.getPickup.pickup_longitude},${this.getPickup.pickup_latitude}&limit=5&apiKey=${process.env.NUXT_ENV_GEOAPIFY_KEY}`
+        )
+        .then((res) => {
+          this.cabsCoordinates = res.data.features
+        })
+        .catch(() => console.clear())
+
       this.cabsCoordinates.forEach((cab) => {
-        const el = document.getElementById('cab_marker')
+        const el = document.createElement('div')
+        el.innerHTML = `<?xml version="1.0"?>
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" version="1.1" width="80" height="80" x="0" y="0" viewBox="0 0 47.032 47.032" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><circle r="23.516" cx="23.516" cy="23.516" fill="#000000" shape="circle" transform="matrix(0.54,0,0,0.54,10.817360343933105,10.817360343933105)"/><g transform="matrix(0.5,0,0,0.5,11.758000373840325,11.758000373840334)">
+            <g xmlns="http://www.w3.org/2000/svg">
+              <path d="M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759   c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z    M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713   v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336   h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805z" fill="#fff9f9" data-original="#000000" style="" class=""/>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+              <g>
+              </g>
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            <g xmlns="http://www.w3.org/2000/svg">
+            </g>
+            </g></svg>
+            `
+
         new this.$MapBoxGl.Marker({
           color: 'black',
           element: el,
         })
-          .setLngLat(cab)
+          .setLngLat(cab.geometry.coordinates)
           .addTo(this.map)
       })
     },
@@ -231,7 +306,7 @@ export default {
         })
 
         /* add nearby cab coordinates marker */
-        // this.addCabsMarker()
+        this.addCabsMarker()
       }
     },
     getDestinationLocation() {
