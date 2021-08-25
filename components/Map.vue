@@ -1,17 +1,23 @@
 <template>
-  <div id="map" class="w-full h-[40%] z-40 lg:h-full">
+  <div id="map" class="w-full h-[35%] relative z-40 lg:h-full">
     <slot :route="route" />
     <div class="hidden">
-      <svg-square-outline-bold id="pickup_marker" class="w-5 h-5"></svg-square-outline-bold>
-      <svg-circle-outline-bold id="destination_marker" class="w-5 h-5"></svg-circle-outline-bold>
+      <svg-square-outline-bold
+        id="pickup_marker"
+        class="w-5 h-5"
+      ></svg-square-outline-bold>
+      <svg-circle-outline-bold
+        id="destination_marker"
+        class="w-5 h-5"
+      ></svg-circle-outline-bold>
       <svg-placeholder id="default_marker" class="w-12 h-12"></svg-placeholder>
     </div>
   </div>
 </template>
 <script>
 // import getcenter from 'geolib/es/getCenter'
+import { mapGetters,mapMutations } from 'vuex'
 export default {
-  props: ['pickupAddress', 'destinationAddress'],
   data() {
     return {
       map: null,
@@ -28,7 +34,7 @@ export default {
         bottom: [0, -20],
         'bottom-left': [10, -20],
         left: [-10, -15],
-        right: [-10,-10],
+        right: [-10, -10],
       },
     }
   },
@@ -45,6 +51,8 @@ export default {
 
     this.map.on('load', () => {
       this.geolocate.trigger()
+      this.getPickupLocation()
+      this.getDestinationLocation()
     })
 
     // this.addDirectionControl()
@@ -53,6 +61,7 @@ export default {
     this.addGeolocateControl()
   },
   methods: {
+    ...mapMutations('map',['clearAll']),
     addDirectionControl() {
       const directions = new this.$MapboxDirections({
         accessToken: this.accessToken,
@@ -172,15 +181,16 @@ export default {
         'waterway-label'
       )
     },
-  },
-  watch: {
-    pickupAddress: function () {
-      if (Object.keys(this.pickupAddress).length > 0) {
-        const location = [this.pickupAddress.lon, this.pickupAddress.lat]
+    getPickupLocation() {
+      if (this.getPickupStatus) {
+        const location = [
+          this.getPickup.pickup_longitude,
+          this.getPickup.pickup_latitude,
+        ]
         this.map.setCenter(location)
         this.coordinates.push({
           loc: location,
-          name: this.pickupAddress.name,
+          name: this.getPickup.pickup_address,
           el_id: 'pickup_marker',
           way: 'From - ',
         })
@@ -197,16 +207,16 @@ export default {
         })
       }
     },
-    destinationAddress: function () {
-      if (Object.keys(this.destinationAddress).length > 0) {
+    getDestinationLocation() {
+      if (this.getDestinationStatus) {
         const pickupLocation = {
-          longitude: this.pickupAddress.lon,
-          latitude: this.pickupAddress.lat,
+          longitude: this.getPickup.pickup_longitude,
+          latitude: this.getPickup.pickup_latitude,
         }
 
         const destLocation = {
-          longitude: this.destinationAddress.lon,
-          latitude: this.destinationAddress.lat,
+          longitude: this.getDestination.destination_longitude,
+          latitude: this.getDestination.destination_latitude,
         }
 
         // current pickup location
@@ -225,14 +235,17 @@ export default {
 
         this.coordinates.push({
           loc: [destLocation.longitude, destLocation.latitude],
-          name: this.destinationAddress.name,
+          name: this.getDestination.destination_address,
           el_id: 'destination_marker',
           way: 'To - ',
         })
 
         this.addMarker()
         this.map.flyTo({
-          center: this.destinationAddress,
+          center: [
+            this.getDestination.destination_longitude,
+            this.getDestination.destination_latitude,
+          ],
           zoom: 13,
           essential: true,
           bearing: 0,
@@ -243,6 +256,23 @@ export default {
         const routeCoords = `${pickupLocation.longitude},${pickupLocation.latitude};${destLocation.longitude},${destLocation.latitude}`
         this.getRoute(routeCoords)
       }
+    },
+  },
+  computed: {
+    ...mapGetters('map', [
+      'getPickupStatus',
+      'getDestinationStatus',
+      'getPickup',
+      'getDestination',
+    ]),
+  },
+
+  watch: {
+    getPickupStatus: function () {
+      this.getPickupLocation()
+    },
+    getDestinationStatus: function () {
+      this.getDestinationLocation()
     },
   },
 }

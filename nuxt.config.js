@@ -32,6 +32,12 @@ export default {
     {
       src: '~/plugins/MapBox', mode: 'client'
     },
+    {
+      src: '~/plugins/VueTooltip'
+    },
+    {
+      src: '~/plugins/VuexPersistedState', mode: 'client'
+    },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -57,5 +63,6 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    transpile: ['vue-tooltip']
   },
 }
