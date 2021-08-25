@@ -21,8 +21,9 @@
           bg-blue-700
           w-full
           text-white
-          p-10
-          py-5
+          px-5
+          py-2
+          lg:py-5
           flex
           lg:rounded-t-lg
           flex-col
@@ -36,48 +37,46 @@
           <h3
             class="flex flex-row space-x-2 items-center truncate cursor-pointer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-2 w-2 mx-4"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12z"
-              /></svg
-            ><span v-if="getPickup" v-tooltip="getPickup.pickup_address">{{
+            <svg-circle-outline class="w-2 h-2"></svg-circle-outline>
+            <span v-if="getPickup" v-tooltip="getPickup.pickup_address">{{
               `From-${getPickup.pickup_address}`
             }}</span>
             <span v-else>Where From? </span>
           </h3>
-          <div
-            class="
-              border border-black
-              transform
-              rotate-90
-              w-8
-              translate-x-1
-              border-opacity-70
-            "
-          ></div>
+          <svg-subtract class="w-8 transform rotate-90 -translate-x-3"></svg-subtract>
           <h3
             class="flex flex-row space-x-2 items-center truncate cursor-pointer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-2 w-2 mx-4"
-              viewBox="0 0 24 24"
-            >
-              <path d="M22 2v20h-20v-2030zm2-2h-24v24h24v-24z" /></svg
-            ><span
+            <svg-square-outline class="w-2 h-2"></svg-square-outline>
+            <span
               v-tooltip="getDestination.destination_address"
               v-if="getDestination"
               >{{ `To-${getDestination.destination_address}` }}</span
             >
             <span v-else>Where To?</span>
           </h3>
-          <button @click="clearAll();$router.go();">Reset Address</button>
+          <div
+            :class="route ? 'justify-between' : 'justify-center'"
+            class="flex flex-row items-center mt-3 text-sm"
+          >
+            <p v-if="route" class="flex flex-col space-y-1">
+              <span>Distance - {{ route.distance | distanceInKm }}km </span>
+              <span
+                >Duration - {{ route.duration | durationInMin }} min</span
+              >
+            </p>
+            <button
+              :class="!route ? '' : 'w-[40%]'"
+              @click="
+                clearAll()
+                $router.go()
+              "
+            >
+              Reset
+            </button>
+          </div>
         </div>
-        <h2 v-else>Where can we pick you up?</h2>
+        <h2 v-else class="py-5">Where can we pick you up?</h2>
       </div>
       <div
         class="
@@ -124,23 +123,7 @@
 
           <div v-else>
             <ul>
-              <li
-                v-for="i in 20"
-                :key="i"
-                class="
-                  py-4
-                  px-7
-                  cursor-pointer
-                  flex flex-row
-                  space-x-5
-                  items-center
-                  hover:bg-gray-200
-                  overflow-y-scroll
-                  scrollbar-hide
-                "
-              >
-                Uber {{ i }}
-              </li>
+              <uber-item :route="route" v-for="i in 10" :key="i"></uber-item>
             </ul>
           </div>
         </div>
@@ -155,15 +138,19 @@
           </ul>
         </div>
       </div>
-      <div v-if="getDestinationStatus" class="flex items-center justify-center py-5 w-full">
+      <div
+        v-if="getDestinationStatus"
+        class="flex items-center justify-center py-2 lg:py-5 w-full"
+      >
         <button class="w-[70%] mx-auto">Request Uber</button>
       </div>
     </div>
   </client-only>
 </template>
 <script>
-import { mapGetters,mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
+  props: ['route'],
   data() {
     return {
       locationData: '',
@@ -171,7 +158,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('map',['clearAll']),
+    ...mapMutations('map', ['clearAll']),
     autoComplete() {
       this.$axios
         .get(
@@ -183,6 +170,14 @@ export default {
         .catch(() => {
           console.clear()
         })
+    },
+  },
+  filters: {
+    distanceInKm: function (val) {
+      return parseFloat(val / 1000).toFixed(2)
+    },
+    durationInMin: function (val) {
+      return parseFloat(val / 60).toFixed(2)
     },
   },
   computed: {

@@ -1,6 +1,5 @@
 <template>
   <div id="map" class="w-full h-[35%] relative z-40 lg:h-full">
-    <slot :route="route" />
     <div class="hidden">
       <svg-square-outline-bold
         id="pickup_marker"
@@ -11,17 +10,22 @@
         class="w-5 h-5"
       ></svg-circle-outline-bold>
       <svg-placeholder id="default_marker" class="w-12 h-12"></svg-placeholder>
+      <svg-car-top id="cab_marker" class="w-12 h-12"></svg-car-top>
     </div>
   </div>
 </template>
 <script>
 // import getcenter from 'geolib/es/getCenter'
-import { mapGetters,mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   data() {
     return {
       map: null,
       coordinates: [],
+      cabsCoordinates: [
+        [0, 0],
+        [-77.0364,38.8951],
+      ],
       zoom: 11,
       style: this.$MapStyle,
       accessToken: this.$AccessToken,
@@ -61,7 +65,7 @@ export default {
     this.addGeolocateControl()
   },
   methods: {
-    ...mapMutations('map',['clearAll']),
+    ...mapMutations('map', ['clearAll']),
     addDirectionControl() {
       const directions = new this.$MapboxDirections({
         accessToken: this.accessToken,
@@ -103,7 +107,7 @@ export default {
     addMapControl(control, options) {
       this.map.addControl(control, options)
     },
-    addMarker() {
+    addPickDestMarker() {
       this.coordinates.forEach((coord) => {
         const el = document.getElementById(coord.el_id)
         new this.$MapBoxGl.Marker({
@@ -130,6 +134,17 @@ export default {
           .addTo(this.map)
       })
     },
+    addCabsMarker() {
+      this.cabsCoordinates.forEach((cab) => {
+        const el = document.getElementById('cab_marker')
+        new this.$MapBoxGl.Marker({
+          color: 'black',
+          element: el,
+        })
+          .setLngLat(cab)
+          .addTo(this.map)
+      })
+    },
     async getRoute(coordinates) {
       await this.$axios
         .get(
@@ -141,7 +156,9 @@ export default {
           const distance = data.distance // in meters
           const duration = data.duration /* in seconds */
 
-          this.route = { distance, duration }
+          const routeParam = { distance, duration }
+
+          this.$emit('getRouteParam', routeParam)
 
           const route = data.geometry.coordinates
           const geojson = {
@@ -195,7 +212,7 @@ export default {
           way: 'From - ',
         })
 
-        this.addMarker()
+        this.addPickDestMarker()
         this.map.flyTo({
           center: location,
           zoom: 13,
@@ -205,6 +222,9 @@ export default {
           curve: 1,
           easing: (t) => t,
         })
+
+        /* add nearby cab coordinates marker */
+        // this.addCabsMarker()
       }
     },
     getDestinationLocation() {
@@ -240,7 +260,7 @@ export default {
           way: 'To - ',
         })
 
-        this.addMarker()
+        this.addPickDestMarker()
         this.map.flyTo({
           center: [
             this.getDestination.destination_longitude,
