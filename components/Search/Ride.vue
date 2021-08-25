@@ -43,7 +43,9 @@
             }}</span>
             <span v-else>Where From? </span>
           </h3>
-          <svg-subtract class="w-8 transform rotate-90 -translate-x-3"></svg-subtract>
+          <svg-subtract
+            class="w-8 transform rotate-90 -translate-x-3"
+          ></svg-subtract>
           <h3
             class="flex flex-row space-x-2 items-center truncate cursor-pointer"
           >
@@ -60,10 +62,7 @@
             class="flex flex-row items-center mt-3 text-sm"
           >
             <p v-if="route" class="flex flex-col space-y-1">
-              <span>Distance - {{ route.distance | distanceInKm }}km </span>
-              <span
-                >Duration - {{ route.duration | durationInMin }} min</span
-              >
+              <span>Distance - {{ route.distance | distanceInKm }} km away</span>
             </p>
             <button
               :class="!route ? '' : 'w-[40%]'"
@@ -175,9 +174,6 @@ export default {
   filters: {
     distanceInKm: function (val) {
       return parseFloat(val / 1000).toFixed(2)
-    },
-    durationInMin: function (val) {
-      return parseFloat(val / 60).toFixed(2)
     },
   },
   computed: {

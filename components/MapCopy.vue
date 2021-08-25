@@ -151,7 +151,7 @@ export default {
     async getRoute(coordinates) {
       await this.$axios
         .get(
-          `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${coordinates}?annotations=congestion&overview=full&geometries=geojson&access_token=${process.env.NUXT_ENV_MAPBOX_KEY}
+          `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?geometries=geojson&access_token=${process.env.NUXT_ENV_MAPBOX_KEY}
 `
         )
         .then((res) => {

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import MapBoxGl from 'mapbox-gl'
-import * as Turf from '@turf/turf'
-import '@mapbox/polyline'
+import {lineString as TurMakeLineString} from '@turf/helpers'
+import * as Polyline from '@mapbox/polyline'
 import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -13,4 +13,5 @@ Vue.prototype.$AccessToken = process.env.NUXT_ENV_MAPBOX_KEY
 Vue.prototype.$MapBoxGl = MapBoxGl
 Vue.prototype.$MapboxDirections = MapboxDirections;
 Vue.prototype.$MapboxGeocoder = MapboxGeocoder
-Vue.prototype.$Turf = Turf
+Vue.prototype.$TurMakeLineString = TurMakeLineString
+Vue.prototype.$Polyline = Polyline
