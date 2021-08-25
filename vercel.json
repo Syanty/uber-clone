@@ -5,17 +5,5 @@
             "use": "@nuxtjs/vercel-builder",
             "config": {}
         }
-    ],
-    "env": {
-        "NUXT_ENV_GEOAPIFY_KEY": true,
-        "NUXT_ENV_NUMVERIFY_KEY": true,
-        "NUXT_ENV_MAPBOX_KEY": true
-    },
-    "build": {
-        "env": {
-            "NUXT_ENV_GEOAPIFY_KEY": true,
-            "NUXT_ENV_MAPBOX_KEY": true,
-            "NUXT_ENV_NUMVERIFY_KEY": true
-        }
-    }
+    ]
 }
