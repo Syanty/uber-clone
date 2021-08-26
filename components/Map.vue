@@ -258,6 +258,20 @@ export default {
             /* add route layer i.e path */
             this.addRouteLayer()
           }
+
+          // fly to pickup location
+          this.map.flyTo({
+            center: [
+              this.getPickup.pickup_longitude,
+              this.getPickup.pickup_latitude,
+            ],
+            zoom: 13,
+            essential: true,
+            bearing: 0,
+            speed: 1,
+            curve: 1,
+            easing: (t) => t,
+          })
         })
         .catch(() => {})
     },
@@ -329,19 +343,6 @@ export default {
 
         const routeCoords = `${pickupLocation.longitude},${pickupLocation.latitude};${destLocation.longitude},${destLocation.latitude}`
         this.getRoute(routeCoords)
-        this.map.flyTo({
-          center: [
-            this.getPickup.pickup_longitude,
-            this.getPickup.pickup_latitude,
-          ],
-          zoom: 13,
-          essential: true,
-          bearing: 0,
-          speed: 1,
-          curve: 1,
-          duration: 5000,
-          easing: (t) => t,
-        })
       }
     },
   },

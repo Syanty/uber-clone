@@ -2,14 +2,14 @@
   <li
     class="
       py-3
-      px-7
+      px-2
       cursor-pointer
       flex flex-row
       space-x-5
       items-center
       hover:bg-gray-200
       overflow-y-scroll
-      scrollbar-hide active:bg-gray-400
+      scrollbar-hide
     "
   >
     <div v-if="!route" class="animate-pulse flex items-center space-x-4 w-full">
@@ -47,6 +47,6 @@
 </template>
 <script>
 export default {
-  props: ['route'],
+  props: ['route', 'item'],
 }
 </script>

@@ -1,6 +1,11 @@
 <template>
   <div class="h-screen">
-    <LayoutAuthHeader />
-    <Nuxt />
+    <div v-if="$nuxt.isOffline">
+      <no-internet></no-internet>
+    </div>
+    <div v-else>
+      <LayoutAuthHeader />
+      <Nuxt />
+    </div>
   </div>
 </template>
