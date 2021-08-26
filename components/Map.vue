@@ -10,7 +10,6 @@
         class="w-5 h-5"
       ></svg-circle-outline-bold>
       <svg-placeholder id="default_marker" class="w-12 h-12"></svg-placeholder>
-      <svg-car-top class="car w-12 h-12"></svg-car-top>
     </div>
   </div>
 </template>
@@ -37,8 +36,6 @@ export default {
         left: [-10, -15],
         right: [-10, -10],
       },
-      /* bbox: [0, 0, 0, 0],
-      polygon: this.$Turf.bboxPolygon(bbox), */
     }
   },
   mounted() {
@@ -54,7 +51,7 @@ export default {
     })
 
     this.map.on('load', () => {
-      this.geolocate.trigger()
+      // this.geolocate.trigger()
       this.getPickupLocation()
       this.getDestinationLocation()
     })
@@ -214,7 +211,6 @@ export default {
             </g>
             </g></svg>
             `
-
         new this.$MapBoxGl.Marker({
           color: 'black',
           element: el,
@@ -320,20 +316,7 @@ export default {
           longitude: this.getDestination.destination_longitude,
           latitude: this.getDestination.destination_latitude,
         }
-
-        // current pickup location
-        // const pickupLocation = this.map.getCenter()
-
-        /* const coordinates = [
-          {
-            longitude: pickupLocation.lng,
-            latitude: pickupLocation.lat,
-          },
-          destLocation,
-        ]
-        const center = getcenter(coordinates)
-
-        this.map.setCenter([center.longitude, center.latitude]) */
+        this.map.setCenter([destLocation.longitude, destLocation.latitude])
 
         this.coordinates.push({
           loc: [destLocation.longitude, destLocation.latitude],
@@ -343,20 +326,22 @@ export default {
         })
 
         this.addPickDestMarker()
+
+        const routeCoords = `${pickupLocation.longitude},${pickupLocation.latitude};${destLocation.longitude},${destLocation.latitude}`
+        this.getRoute(routeCoords)
         this.map.flyTo({
           center: [
-            this.getDestination.destination_longitude,
-            this.getDestination.destination_latitude,
+            this.getPickup.pickup_longitude,
+            this.getPickup.pickup_latitude,
           ],
           zoom: 13,
           essential: true,
           bearing: 0,
           speed: 1,
           curve: 1,
+          duration: 5000,
           easing: (t) => t,
         })
-        const routeCoords = `${pickupLocation.longitude},${pickupLocation.latitude};${destLocation.longitude},${destLocation.latitude}`
-        this.getRoute(routeCoords)
       }
     },
   },

@@ -9,7 +9,7 @@
       items-center
       hover:bg-gray-200
       overflow-y-scroll
-      scrollbar-hide
+      scrollbar-hide active:bg-gray-400
     "
   >
     <div v-if="!route" class="animate-pulse flex items-center space-x-4 w-full">
